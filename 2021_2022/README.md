@@ -6,7 +6,7 @@ In de theorieles wordt gebruikt gemaakt van notebooks (geschreven in de Python p
 ## Online gebruik (zonder installatie)
 Met behulp van [Binder](https://mybinder.org/) kan het bijna niet gemakkelijker: klik op de badge van 'Binder' hieronder en je kan onmiddellijk aan de slag (kan soms een tijdje duren om in te laden, afhankelijk van de systeembelasting).
 
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/inopens/modsim_demos/master)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/davidfernand/modsim_demos/HEAD)
 
 **Het is wel niet mogelijk om je werk in Binder op te slaan. Wat wel kan is de Notebook downloaden (in .ipynb formaat) en dan via een lokale installatie op je eigen computer verder gebruiken (zie hieronder)**
 
@@ -25,7 +25,7 @@ In the theory class notebooks were used (written in the Python programming langu
 ## Online usage (without installation)
 By using the [Binder](https://mybinder.org/) things cannot get any simpler: click the 'Binder' badge below to get going (sometimes takes a while to load, depending on the system load).
 
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/inopens/modsim_demos/master)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/davidfernand/modsim_demos/HEAD)
 
 **It is not possible though to save your changes in Binder. It is possible to download the Notebook (in .ipynb format) and use that in a local installation on your computer (see below)**
 
