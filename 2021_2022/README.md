@@ -20,7 +20,7 @@ Een cel wordt uitgevoerd met ```shift+enter```, alternatief kan je ook in het me
 # English: ModSim demos 
 Notebooks in support of the theoretical classes of Modelling and Simulation classes
 
-In the theory class notebooks were used (written in the Python programming language and embedded in the Jupyter environment) in ordet to illustrate cerrtain concepts. To get going with such notebooks, there are several options. With a (free) installation of the software, you can use the notebooks off-line. There is also an option where you don't need to install anything, but this requires you to work on-line.
+In the theory class notebooks were used (written in the Python programming language and embedded in the Jupyter environment) in order to illustrate certain concepts. To get going with such notebooks, there are several options. With a (free) installation of the software, you can use the notebooks off-line. There is also an option where you don't need to install anything, but this requires you to work on-line.
 
 ## Online usage (without installation)
 By using the [Binder](https://mybinder.org/) things cannot get any simpler: click the 'Binder' badge below to get going (sometimes takes a while to load, depending on the system load).
@@ -34,4 +34,4 @@ Via the Anaconda navigator you can launch several applications, such as Spyder (
 
 ## General usage
 
-A cel is run using ```shift+enter```, alternatively one can got to the menu ```Cell``` and click ```Run all``` to run all cells at once.
+A cell is run using ```shift+enter```, alternatively one can got to the menu ```Cell``` and click ```Run all``` to run all cells at once.
