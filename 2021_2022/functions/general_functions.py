@@ -11,6 +11,7 @@ import math
 # For solver
 from scipy.integrate import odeint
 from scipy import optimize
+from IPython.display import display
 
 # Plot settings
 base_context = {
@@ -59,7 +60,7 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler('color', fivethirtyeight)
 figsize = (9,6)
 
 def model(timesteps, init, varnames, f, returnDataFrame=False,
-          plotresults=True, **kwargs):
+          plotresults=True,twinax=False, **kwargs):
     """
     Model implementation
 
@@ -80,6 +81,9 @@ def model(timesteps, init, varnames, f, returnDataFrame=False,
     returnDataFrame: bool
         set to True to get back the simulation data
 
+    twinax: bool
+        set to True to plot temperature to secondary axis in heat balance case
+
     kwargs: dict
         function specific parameters
 
@@ -91,9 +95,17 @@ def model(timesteps, init, varnames, f, returnDataFrame=False,
 
     if plotresults:
         fig, ax = plt.subplots(figsize=figsize)
-        modeloutput.plot(ax=ax);
+        if twinax: # Only for the heat balance example (hardcoded)
+            modeloutput['$N_2O_5$'].plot(ax=ax);
+            modeloutput['$N_2O_4$'].plot(ax=ax);
+            ax_twin = ax.twinx();
+            ax_twin.yaxis.label.set_color('blue');
+            ax_twin.tick_params(axis='y', colors='blue');
+            modeloutput['$\mathrm{T}$'].plot(ax=ax_twin,color='blue');
+        else:
+            modeloutput.plot(ax=ax);
     if returnDataFrame:
-        return modeloutput
+        return modeloutput;
 
 def sensitivity(timesteps, init, varnames, f, parametername,
                   log_perturbation=-4, sort='absolute', **kwargs):
