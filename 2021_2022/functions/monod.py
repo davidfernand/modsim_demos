@@ -22,6 +22,6 @@ def model_derivatives(variables, t, kwargs):
     X = variables[0]
     S = variables[1]
 
-    X_new = kwargs['mu_max']*S/(kwargs['K_S'] + S)*X-kwargs['Q']/kwargs['V']*X
-    S_new = -kwargs['mu_max']/kwargs['Y']*S/(kwargs['K_S']+S)*X +kwargs['Q']/kwargs['V']*(kwargs['S_in']-S)
-    return [X_new, S_new]
+    dXdt = kwargs['mu_max']*S/(kwargs['K_S'] + S)*X-kwargs['Q']/kwargs['V']*X
+    dSdt = -kwargs['mu_max']/kwargs['Y']*S/(kwargs['K_S']+S)*X +kwargs['Q']/kwargs['V']*(kwargs['S_in']-S)
+    return [dXdt, dSdt]

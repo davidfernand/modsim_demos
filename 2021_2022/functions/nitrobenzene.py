@@ -25,7 +25,7 @@ def model_derivatives(variables, t, kwargs):
     N2O5 = variables[1]
     C6H5NO2 = variables[2]
 
-    C6H6_new = -2*kwargs['k']*C6H6*C6H6*N2O5 + kwargs['Q']/kwargs['V']*(kwargs['C6H6_in'] - C6H6)
-    N2O5_new = -kwargs['k']*C6H6*C6H6*N2O5 + kwargs['Q']/kwargs['V']*(kwargs['N2O5_in'] - N2O5)
-    C6H5NO2_new = 2*kwargs['k']*C6H6*C6H6*N2O5 - kwargs['Q']/kwargs['V']*C6H5NO2
-    return [C6H6_new, N2O5_new, C6H5NO2_new]
+    dC6H6dt = -2*kwargs['k']*C6H6*C6H6*N2O5 + kwargs['Q']/kwargs['V']*(kwargs['C6H6_in'] - C6H6)
+    dN2O5dt = -kwargs['k']*C6H6*C6H6*N2O5 + kwargs['Q']/kwargs['V']*(kwargs['N2O5_in'] - N2O5)
+    dC6H5NO2dt = 2*kwargs['k']*C6H6*C6H6*N2O5 - kwargs['Q']/kwargs['V']*C6H5NO2
+    return [dC6H6dt, dN2O5dt, dC6H5NO2dt]

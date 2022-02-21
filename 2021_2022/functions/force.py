@@ -6,7 +6,7 @@ Ingmar Nopens, Daan Van Hauwermeiren, David Fernandes del Pozo
 # Import of all functionalities
 import numpy as np
 import pandas as pd
-# For solver
+
 from scipy.integrate import odeint
 
 # ----------------------------
