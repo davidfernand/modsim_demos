@@ -4,7 +4,8 @@ General functions
 Daan Van Hauwermeiren, David Fernandes del Pozo
 """
 # Import all relevant python functions and libraries
-import matplotlib.pyplot as plt
+from cProfile import label
+import matplotlib as plt
 import numpy as np
 import pandas as pd
 import math
@@ -24,7 +25,7 @@ base_context = {
     "legend.fontsize": 10,
 
     "grid.linewidth": 1,
-    "lines.linewidth": 4,#1.75,
+    "lines.linewidth": 2,#1.75,
     "patch.linewidth": .3,
     "lines.markersize": 7,
     "lines.markeredgewidth": 0,
@@ -94,7 +95,7 @@ def model(timesteps, init, varnames, f, returnDataFrame=False,
     modeloutput = pd.DataFrame(data, index=idx)
 
     if plotresults:
-        fig, ax = plt.subplots(figsize=figsize)
+        fig, ax = plt.pyplot.subplots(figsize=figsize)
         if twinax: # Only for the heat balance example (hardcoded)
             modeloutput['$N_2O_5$'].plot(ax=ax);
             modeloutput['$N_2O_4$'].plot(ax=ax);
@@ -103,9 +104,12 @@ def model(timesteps, init, varnames, f, returnDataFrame=False,
             ax_twin.tick_params(axis='y', colors='blue');
             modeloutput['$\mathrm{T}$'].plot(ax=ax_twin,color='blue');
         else:
-            modeloutput.plot(ax=ax);
+            labels =  ['${{{}}}$'.format(x) for x in varnames]
+            modeloutput.plot(ax=ax,label=labels);
+            ax.legend();
     if returnDataFrame:
         return modeloutput;
+
 
 def sensitivity(timesteps, init, varnames, f, parametername,
                   log_perturbation=-4, sort='absolute', **kwargs):
@@ -157,7 +161,7 @@ def sensitivity(timesteps, init, varnames, f, parametername,
 
     if sort == 'relative total sensitivity':
         sens = (res_high - res_low)/(2.*perturbation)*parametervalues/res_basis
-    fig, ax = plt.subplots(figsize=figsize)
+    fig, ax = plt.pyplot.subplots(figsize=figsize)
     sens.plot(ax=ax)
     ax.set_xlabel(r'$\mathrm{Time}$')
     ax.set_ylabel(sort)
@@ -165,7 +169,7 @@ def sensitivity(timesteps, init, varnames, f, parametername,
 def sse(simulation, data):
     return np.sum(np.sum((np.atleast_2d(data) - np.atleast_2d(simulation))**2))
 
-def track_calib(opt_fun, X, param_names, method='Nelder-Mead', tol=1e-4):
+def track_calib(opt_fun, X, param_names, method='Nelder-Mead',bounds='none',maxiter='none', tol=1e-4):
     """
     Optimisation using the Nelder-Mead algorithm. All iteration steps are tracked.
 
@@ -177,7 +181,7 @@ def track_calib(opt_fun, X, param_names, method='Nelder-Mead', tol=1e-4):
         parameters
     method : str
         Define the method for optimisation, options are: 'Nelder-Mead', 'BFGS', 'Powell'
-        basinhopping', 'brute', 'differential evolution'
+        'L-BFGS-B','basinhopping', 'brute', 'differential evolution'
     toll: float
         tolerance to determine the endpoint of the optimisation. Is not used in
         method options 'brute' and 'basinhopping
@@ -198,8 +202,13 @@ def track_calib(opt_fun, X, param_names, method='Nelder-Mead', tol=1e-4):
         results.append(result) # Keep track of intermediate SSE
         return result
 
-    if method in ['Nelder-Mead', 'BFGS', 'Powell']:
-        res = optimize.minimize(internal_opt_fun, X, method=method, tol=tol)
+    if method in ['Nelder-Mead', 'Powell','L-BFGS-B']:
+        res = optimize.minimize(internal_opt_fun, X, method=method,bounds=bounds,options  = {"maxiter":maxiter}, tol=tol)
+    elif method=='BFGS':
+        res = optimize.minimize(internal_opt_fun, X, method=method,options  = {"maxiter":maxiter}, tol=tol)
+    elif method=='Newton-CG':
+        fprime = lambda x: optimize.approx_fprime(x, internal_opt_fun, 0.001)
+        res = optimize.minimize(internal_opt_fun, X, method=method,jac=fprime,options  = {"maxiter":maxiter}, tol=tol)
     elif method == 'basinhopping':
         res = optimize.basinhopping(internal_opt_fun, X)
     elif method == 'brute':
@@ -216,7 +225,7 @@ def track_calib(opt_fun, X, param_names, method='Nelder-Mead', tol=1e-4):
     return parameters,results
 
 def plot_calib(parameters, results, i, data, sim_model):
-    fig, ax = plt.subplots(figsize=figsize)
+    fig, ax = plt.pyplot.subplots(figsize=figsize)
     cols = data.columns
     data[cols].plot(ax=ax, linestyle='', marker='.', markersize=15,
               color=[fivethirtyeight[0], fivethirtyeight[1]])
@@ -228,41 +237,50 @@ def plot_calib(parameters, results, i, data, sim_model):
     handles, labels = ax.get_legend_handles_labels()
     labels = [l+' simulation' if (i>= data.shape[1]) else l for i, l in enumerate(labels)]
     ax.legend(handles, labels, loc='best')
-    fig, ax = plt.subplots(figsize=figsize)
+    fig, ax = plt.pyplot.subplots(figsize=figsize)
     cols = parameters.columns
     c = results - min(results)
-    c *= 1/max(c)
-    sc = ax.scatter(parameters[cols[0]], parameters[cols[1]], c=c, s=50, cmap="viridis", vmax=1)
-    cbar = plt.colorbar(sc)
-    cbar.set_ticks([0.05*max(c), 0.95*max(c)])
-    cbar.set_ticklabels(['Low value \nobjective function', 'High value\nobjective function'])
-    ax.scatter(parameters[cols[0]].iloc[0], parameters[cols[1]].iloc[0], marker='o', s=450, c=fivethirtyeight[2]) # startwaarde
-    ax.scatter(parameters[cols[0]].iloc[-1], parameters[cols[1]].iloc[-1], marker='*', s=500, c=fivethirtyeight[1]) # eindwaarde
-    ax.scatter(parameters[cols[0]].iloc[i], parameters[cols[1]].iloc[i], s=150, vmax=1, c=fivethirtyeight[4])        # huidige waarde
+    c *= 1/max(results)
+    sc = ax.scatter(parameters[cols[0]], parameters[cols[1]], c=c, s=50, cmap="viridis", vmax=1,label='_nolegend_')
+    cbar = plt.pyplot.colorbar(sc, format='%.2f')
+    #cbar.set_ticks([0.05*max(c), 0.95*max(c)])
+    cbar.set_ticks([min(c), max(c)])
+    #cbar.set_ticklabels([np.round(min(results),3), np.round(max(results),3)])
+    cbar.set_label(r'$\frac{J(\theta)-J(\hat{\theta})}{max(J(\theta))}$', rotation=0,fontsize=30)
+    #cbar.set_ticklabels(['Low value \nobjective function', 'High value\nobjective function'])
+    ax.scatter(parameters[cols[0]].iloc[0], parameters[cols[1]].iloc[0], marker='o', s=300,c='b',label=r'$\mathrm{Initial}$') 
+    ax.scatter(parameters[cols[0]].iloc[-1], parameters[cols[1]].iloc[-1], marker='*', s=300, c=fivethirtyeight[1],label=r'$\mathrm{Optimal}$') 
+    ax.scatter(parameters[cols[0]].iloc[i], parameters[cols[1]].iloc[i], marker='o', s=200, vmax=1,facecolors='none', edgecolors='k',linewidths=2,label=r'$\mathrm{Solver}$')
+    ax.legend(loc='best')
     ax.set_xlabel(cols[0])
     ax.set_ylabel(cols[1])
     ax.set_xlim(0.95*parameters[cols[0]].min(), 1.05*parameters[cols[0]].max())
     ax.set_ylim(0.95*parameters[cols[1]].min(), 1.05*parameters[cols[1]].max())
 
-def plot_contour_monod(optimizer):
-    n_points = 30
+def plot_contour_monod(optimizer,optimal):
+    n_points = 90
+    mu_max_opt = optimal[0]
+    K_s_opt = optimal[1]
     #n_points = kwargs[4]
-    mu_max = np.logspace(np.log10(0.001), np.log10(50), n_points)
+    mu_max = np.logspace(np.log10(0.0001), np.log10(0.01), n_points)
     #mu_max = np.logspace(np.log10(kwargs[0]), np.log10(kwargs[1]), n_points)
-    K_S = np.logspace(np.log10(0.001), np.log10(50), n_points)
+    K_S = np.logspace(np.log10(0.0001), np.log10(0.015), n_points)
     #K_S = np.logspace(np.log10(kwargs[2]), np.log10(kwargs[3]), n_points)
     X_mu_max, X_K_S = np.meshgrid(mu_max, K_S)
     Z = np.array([optimizer(params) for params in zip(X_mu_max.flatten(), X_K_S.flatten())])
     Z = Z.reshape((n_points, n_points))
-    fig, ax = plt.subplots(figsize=(6,5))
+    fig, ax = plt.pyplot.subplots(figsize=(6.5,5.5))
     sc = ax.contourf(X_mu_max, X_K_S, Z, cmap='viridis')
-    cbar = plt.colorbar(sc)
+    ax.scatter(mu_max_opt,K_s_opt, marker='*', s=500, c=fivethirtyeight[1]) 
+
+    cbar = plt.pyplot.colorbar(sc, format='%.2e')
     cbar.set_ticks([0.05*Z.max(), 0.95*Z.max()])
-    cbar.set_ticklabels(['Low value \nobjective function', 'High value\nobjective function'])
+    cbar.set_label(r'$J(\theta)$', rotation=0)
+    #cbar.set_ticklabels(['Low value \nobjective function', 'High value\nobjective function'])
     ax.set_xscale('linear')
     ax.set_yscale('linear')
-    ax.set_xlabel('mu_max')
-    ax.set_ylabel('K_S')
+    ax.set_xlabel(r'$\mu_{max}$')
+    ax.set_ylabel(r'$K_S$')
 
 def plot_contour_force(optimizer):
     n_points = 30
@@ -272,9 +290,9 @@ def plot_contour_force(optimizer):
     Z = np.array([optimizer(params) for params in zip(X_b.flatten(), X_k.flatten())])
     Z = np.log10(Z)
     Z = Z.reshape((n_points, n_points))
-    fig, ax = plt.subplots(figsize=(6,5))
+    fig, ax = plt.pyplot.subplots(figsize=(6,5))
     sc = ax.contourf(X_b, X_k, Z, cmap='viridis')
-    cbar = plt.colorbar(sc)
+    cbar = plt.pyplot.colorbar(sc)
     cbar.set_ticks([0.05*Z.max(), 0.95*Z.max()])
     cbar.set_ticklabels(['Low value \nobjective function', 'High value\nobjective function'])
     ax.set_xscale('linear')
