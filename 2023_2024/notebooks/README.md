@@ -11,7 +11,7 @@ By using the [Binder](https://mybinder.org/) things cannot get any simpler: clic
 **It is not possible though to save your changes in Binder. It is possible to download the Notebook (in .ipynb format) and use that in a local installation on your computer (see below)**
 
 ## With installation
-Via the Anaconda navigator you can launch several applications, such as Spyder (for Python coding), R-studio, or Jupyter notebooks. Installations for Anacoda can be found [here](https://www.continuum.io/downloads) for different operating systems. Open the application after installation, click on ‘Launch’ under jupyter notebook, and the rest is straightforward. You can now download the notebooks as zip-folder from this Github page and save it locally. If you would like to work with VSCode, you can install Python at [here](https://code.visualstudio.com/docs/python/python-tutorial) and follow the Jupyter notebook tutorial [here](https://code.visualstudio.com/docs/datascience/jupyter-notebooks).
+Via the Anaconda navigator you can launch several applications, such as Spyder (for Python coding), R-studio, or Jupyter notebooks. Installations for Anacoda can be found [here](https://www.continuum.io/downloads) for different operating systems. Open the application after installation, click on ‘Launch’ under jupyter notebook, and the rest is straightforward. You can now download the notebooks as zip-folder from this Github page and save it locally. If you would like to work with VSCode, you can install Python [here](https://code.visualstudio.com/docs/python/python-tutorial) and follow the Jupyter notebook tutorial [here](https://code.visualstudio.com/docs/datascience/jupyter-notebooks).
 
 ## General usage
 
